@@ -13,7 +13,7 @@ case class Get(services: ServiceManifest) extends Controller {
   val route = HttpRoute(MethodRoute(HttpGet), PathRoute("/"))
 
   def action(request: HttpRequest): Future[HttpResponse] = now {
-    OkResponse(":-/ this isn't the droid you were looking for.")
+    Ok(":-/ this isn't the droid you were looking for.")
   }
 
 }

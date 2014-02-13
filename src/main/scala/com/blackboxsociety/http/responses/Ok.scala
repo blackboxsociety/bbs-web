@@ -2,7 +2,7 @@ package com.blackboxsociety.http.responses
 
 import com.blackboxsociety.http.HttpResponse
 
-case class OkResponse(body: String, headers: List[String] = List()) extends HttpResponse {
+case class Ok(body: String, headers: List[String] = List()) extends HttpResponse {
 
   type Self = OkResponse
 
