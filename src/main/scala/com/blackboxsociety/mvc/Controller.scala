@@ -9,16 +9,12 @@ trait Controller {
 
   val route: HttpRouteRule
 
-  def preAction(request: Future[HttpRequest]): Future[HttpRequest] = request
+  def middleware: List[(HttpRequest => Future[HttpResponse]) => (HttpRequest => Future[HttpResponse])] = List()
+
+  val run = middleware.reverse.foldLeft[HttpRequest => Future[HttpResponse]](action) { (m, n) =>
+    n(m)
+  }
 
   def action(request: HttpRequest): Future[HttpResponse]
-
-  def postAction(response: Future[HttpResponse]): Future[HttpResponse] = response
-
-  def run(request: HttpRequest): Future[HttpResponse] = for (
-    a <- preAction(now { request });
-    b <- action(a);
-    c <- postAction(now { b })
-  ) yield c
 
 }
