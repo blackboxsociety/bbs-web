@@ -14,7 +14,7 @@ case class Get(services: ServiceManifest) extends Controller {
   val route = HttpRoute(MethodRoute(HttpGet), PathRoute("/"))
 
   def action(request: HttpRequest): Future[HttpResponse] = now {
-    OkResponse(Home())
+    Ok(Home())
   }
 
 }
