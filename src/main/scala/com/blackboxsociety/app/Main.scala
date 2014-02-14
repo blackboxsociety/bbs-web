@@ -15,7 +15,7 @@ object Main {
 
   def routeRequest(s: ServiceManifest, r: Validation[String, HttpRequest]): Future[HttpResponse] = {
     r.fold(
-     error   => now { OkResponse("Something went wrong here") },
+     error   => now { Ok("Something went wrong here") },
      request => s.router.route(request)
     )
   }
