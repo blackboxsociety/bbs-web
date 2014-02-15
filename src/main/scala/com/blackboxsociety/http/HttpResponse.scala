@@ -1,6 +1,10 @@
 package com.blackboxsociety.http
 
-trait HttpResponse {
+import com.blackboxsociety.app.services.ServiceManifest
+import play.api.libs.json.Json
+import com.blackboxsociety.security.crypto.Signed
+
+abstract class HttpResponse(implicit services: ServiceManifest) {
 
   val statusCode: Int
   val body:       String
@@ -15,10 +19,22 @@ trait HttpResponse {
 
   def withSession(s: Map[String, String]): HttpResponse = make(body, headers, s)
 
+  def withSession(s: (String, String)*): HttpResponse = make(body, headers, s.groupBy(_._1).mapValues(_.head._2))
+
   def withNewSession: HttpResponse = make(body, headers, Map())
 
   override def toString: String = {
-    s"HTTP/1.1 $statusCode OK\r\n" + headers.mkString("\r\n") + "\r\n" + body
+    if (session.size > 0) {
+      val json   = Json.toJson(session)
+      val signed = Signed.sign(services.sessionSecret, json.toString())
+      withNewSession.withHeader("Set-Cookie: session=" + signed + "; HttpOnly").toString
+    } else {
+      if (headers.size > 0) {
+        s"HTTP/1.1 $statusCode OK\r\n" + headers.head + "\r\n\r\n" + body
+      } else {
+        s"HTTP/1.1 $statusCode OK\r\n" + headers.mkString("\r\n") + "\r\n" + body
+      }
+    }
   }
 
 }

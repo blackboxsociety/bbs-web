@@ -8,7 +8,7 @@ import scalaz.concurrent.Future._
 import com.blackboxsociety.http.responses._
 import com.blackboxsociety.app.services._
 
-case class Get(services: ServiceManifest) extends Controller {
+case class Get(implicit services: ServiceManifest) extends Controller {
 
   val route = HttpRoute(MethodRoute(HttpGet), PathRoute("/"))
 
