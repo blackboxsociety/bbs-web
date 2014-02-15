@@ -10,7 +10,7 @@ Install
 
 Requires SBT and Scala to be installed locally.
 
-To run the project just run `sbt run` from the project folder.
+To run the project just run `sbt run` from the project folder, or `sbt ~reStart` for auto-recompile.
 
 You can access the dev environment [here](http://localhost:3000)
 
