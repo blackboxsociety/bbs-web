@@ -9,12 +9,12 @@ import com.blackboxsociety.http.responses._
 import com.blackboxsociety.app.services._
 import com.blackboxsociety.app.views._
 
-case class Get(services: ServiceManifest) extends Controller {
+case class Get(implicit services: ServiceManifest) extends Controller {
 
   val route = HttpRoute(MethodRoute(HttpGet), PathRoute("/"))
 
   def action(request: HttpRequest): Future[HttpResponse] = now {
-    Ok(Home())
+    Ok(Home()).withSession("key" -> "value", "no" -> "srs")
   }
 
 }
