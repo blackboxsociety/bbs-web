@@ -1,11 +1,11 @@
 package com.blackboxsociety.mvc
 
-import scala.xml._
+import scalatags.HtmlTag
 import scala.language.implicitConversions
 
 trait View {
 
-  def render: Elem
+  def render: HtmlTag
 
   override def toString: String = render.toString()
 
