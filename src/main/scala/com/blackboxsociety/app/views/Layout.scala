@@ -4,7 +4,7 @@ import com.blackboxsociety.mvc._
 import scalatags.{Tags2, HtmlTag}
 import scalatags.all._
 
-trait Layout extends View {
+trait Layout extends ScalaView {
 
   def render: HtmlTag = html(
     head(
