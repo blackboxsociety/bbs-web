@@ -20,11 +20,11 @@ trait Layout extends View {
         ),
         div(`class`:="identity-box pull-right")
       ),
-      view_body
+      content
     )
   )
 
-  def view_body: HtmlTag
+  def content: HtmlTag
 
   override def toString = s"<!DOCTYPE html>\n${render.toString()}"
 
@@ -32,6 +32,6 @@ trait Layout extends View {
 
 case class Home() extends Layout {
 
-  def view_body: HtmlTag = h1("Welcome to black box society!")
+  def content: HtmlTag = h1("Welcome to black box society!")
 
 }
