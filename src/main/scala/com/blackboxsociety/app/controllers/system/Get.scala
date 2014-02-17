@@ -15,11 +15,12 @@ case class Get(services: ServiceManifest) extends Controller {
 
   def action(request: HttpRequest): Future[HttpResponse] = now {
     if(request.resource.path.startsWith("/assets/")) {
-      val file = request.resource.path.substring(8)
-      if(new File("target/public/" + file).exists())
-        Ok(scala.io.Source.fromFile("target/public/" + file).mkString)
+      val src = "target/public/" + request.resource.path.substring(8)
+      val file = new File(src)
+      if(file.exists() && !src.contains(".."))
+        Ok(scala.io.Source.fromFile(file).mkString)
       else
-        Ok("/assets/" + file + " doesn't exist.")
+        Ok("that resource doesn't exist.")
     } else {
       Ok(":-/ this isn't the droid you were looking for.")
     }
