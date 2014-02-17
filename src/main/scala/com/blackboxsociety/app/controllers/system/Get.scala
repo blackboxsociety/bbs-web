@@ -17,10 +17,11 @@ case class Get(services: ServiceManifest) extends Controller {
     if(request.resource.path.startsWith("/assets/")) {
       val src = "target/public/" + request.resource.path.substring(8)
       val file = new File(src)
-      if(file.exists() && !src.contains(".."))
+      if(file.exists() && !src.contains("..")) {
         Ok(scala.io.Source.fromFile(file).mkString)
-      else
+      } else {
         Ok("that resource doesn't exist.")
+      }
     } else {
       Ok(":-/ this isn't the droid you were looking for.")
     }
