@@ -19,9 +19,7 @@ trait Layout extends ScalaView {
         div(`class`:="brand pull-left")(
           a(href := "/")("Black Box Society")
         ),
-        div(`class`:="identity-box pull-right blue")(
-          "Hello world!"
-        )
+        div(`class`:="identity-box pull-right")
       ),
       container
     )
@@ -35,6 +33,6 @@ trait Layout extends ScalaView {
 
 case class Home() extends Layout {
 
-  def container: HtmlTag = h1("Welcome to black box society!")
+  def container: HtmlTag = h1(`class` := "blue")("Welcome to black box society!")
 
 }
