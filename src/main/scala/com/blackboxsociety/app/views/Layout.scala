@@ -12,7 +12,8 @@ trait Layout extends ScalaView {
       title("Black Box Society"),
       meta(charset := "utf-8"),
       meta(name := "viewport", content := "width=device-width, initial-scale=1.0"),
-      meta(name := "description", content := "Spreading and connecting information")
+      meta(name := "description", content := "Spreading and connecting information"),
+      link(rel := "stylesheet", `type` := "text/css", href := "/assets/css/main.css")
     ),
     body(
       div(`class`:="top nav")(
@@ -33,6 +34,6 @@ trait Layout extends ScalaView {
 
 case class Home() extends Layout {
 
-  def container: HtmlTag = h1("Welcome to black box society!")
+  def container: HtmlTag = h1(`class` := "blue")("Welcome to black box society!")
 
 }
