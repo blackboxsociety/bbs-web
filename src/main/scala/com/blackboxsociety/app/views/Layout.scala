@@ -1,31 +1,32 @@
 package com.blackboxsociety.app.views
 
 import com.blackboxsociety.mvc._
-import scalatags.{Tags2, HtmlTag}
-import scalatags.all._
+import scala.xml.Elem
 
-trait Layout extends ScalaView {
+trait Layout extends HtmlView {
 
-  def render: HtmlTag = html(
-    head(
-      Tags2.title("Black Box Society"),
-      meta(charset := "utf-8"),
-      meta(name := "viewport", content := "width=device-width, initial-scale=1.0"),
-      meta(name := "description", content := "Spreading and connecting information"),
-      link(rel := "stylesheet", `type` := "text/css", href := "/assets/css/main.css")
-    ),
-    body(
-      div(`class`:="top nav")(
-        div(`class`:="brand pull-left")(
-          a(href := "/")("Black Box Society")
-        ),
-        div(`class`:="identity-box pull-right")
-      ),
-      container
-    )
-  )
+  def render: Elem =
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Spreading and connecting information" />
+        <link rel="stylesheet" type="text/css" href="/assets/css/main.css" />
+        <title>Black Box Society</title>
+      </head>
+      <body>
+        <div class="top nav">
+          <div class="brand pull-left">
+            <a href="/">Black Box Society</a>
+          </div>
+          <div class="identity-box pull-right"></div>
+        </div>
+        {container}
+      </body>
+    </html>
 
-  def container: HtmlTag
+  def container: Elem
 
   override def toString = s"<!DOCTYPE html>\n${render.toString()}"
 
@@ -33,6 +34,6 @@ trait Layout extends ScalaView {
 
 case class Home() extends Layout {
 
-  def container: HtmlTag = h1(`class` := "blue")("Welcome to black box society!")
+  def container: Elem = <h1 class="blue">Welcome to black box society!</h1>
 
 }
