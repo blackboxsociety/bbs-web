@@ -7,10 +7,10 @@ import com.blackboxsociety.app.services._
 trait CommonRoutesComponent extends RoutesComponent { self: ServiceManifest =>
 
   val router = HttpRouter(
-    default     = com.blackboxsociety.app.controllers.system.Get(this),
+    default     = com.blackboxsociety.app.controllers.system.Get()(this),
     controllers = List(
-      com.blackboxsociety.app.controllers.index.Get(this),
-      com.blackboxsociety.app.controllers.login.Get(this)
+      com.blackboxsociety.app.controllers.index.Get()(this),
+      com.blackboxsociety.app.controllers.login.Get()(this)
     )
   )
 

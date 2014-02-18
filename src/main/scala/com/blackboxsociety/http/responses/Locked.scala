@@ -1,8 +1,14 @@
 package com.blackboxsociety.http.responses
 
 import com.blackboxsociety.http.HttpResponse
+import com.blackboxsociety.app.services.ServiceManifest
 
-case class Locked(body: String, headers: List[String] = List()) extends HttpResponse {
+case class Locked(body: String,
+                  headers: List[String] = List(),
+                  session: Map[String, String] = Map())
+                 (implicit services: ServiceManifest) extends HttpResponse
+{
   val statusCode: Int = 423
-  def make(body: String, headers: List[String]) = Locked(body, headers)
+  def make(body: String, headers: List[String], session: Map[String, String]) =
+    Locked(body, headers, session)
 }
