@@ -1,7 +1,6 @@
 package com.blackboxsociety.app.views
 
 import com.blackboxsociety.mvc._
-<<<<<<< HEAD
 import scala.xml.Elem
 
 trait Layout extends HtmlView {
