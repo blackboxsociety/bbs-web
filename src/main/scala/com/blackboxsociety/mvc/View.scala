@@ -1,6 +1,5 @@
 package com.blackboxsociety.mvc
 
-import scalatags.HtmlTag
 import scala.language.implicitConversions
 import scala.xml.Elem
 
@@ -12,13 +11,7 @@ trait View[T] {
 
 }
 
-trait ScalaView extends View[HtmlTag] {
-
-  def render: HtmlTag
-
-}
-
-trait HTMLView extends View[Elem] {
+trait HtmlView extends View[Elem] {
 
   def render: Elem
 

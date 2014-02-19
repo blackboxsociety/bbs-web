@@ -19,8 +19,7 @@ object Build extends Build {
     libraryDependencies += "org.scalaz"        %% "scalaz-effect" % "7.0.5",
     libraryDependencies += "org.scalaz"        %% "scalaz-concurrent" % "7.0.5",
     libraryDependencies += "org.scalaz"        %% "scalaz-iteratee" % "7.0.5",
-    libraryDependencies += "com.typesafe.play" % "play-json_2.10" % "2.2.0-RC1",
-    libraryDependencies += "com.scalatags" % "scalatags_2.10" % "0.2.3"
+    libraryDependencies += "com.typesafe.play" % "play-json_2.10" % "2.2.0-RC1"
   )
 
 }
