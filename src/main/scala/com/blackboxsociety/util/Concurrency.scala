@@ -1,10 +1,9 @@
 package com.blackboxsociety.util
 
-import java.util.concurrent.{Future => _, _}
-import scalaz._
+import java.util.concurrent._
 import scalaz.concurrent._
-import effect._
-import Future._
+import scalaz.concurrent.Task._
+import scalaz.effect._
 
 object Concurrency {
 
@@ -16,11 +15,11 @@ object Concurrency {
     })
   }
 
-  def forkIO(n: Future[Unit]): Future[Unit] = now {
-    n.runAsync(identity)
+  def forkIO(n: Task[Unit]): Task[Unit] = now {
+    n.runAsync({ _ => Unit })
   }
 
-  def forkForever(n: Future[Unit]): Future[Unit] = now {
+  def forkForever(n: Task[Unit]): Task[Unit] = now {
     n.runAsync({ _ =>
       forkForever(n)
     })

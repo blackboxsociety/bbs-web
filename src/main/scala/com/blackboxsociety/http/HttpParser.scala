@@ -1,11 +1,11 @@
 package com.blackboxsociety.http
 
 import scala.util.parsing.combinator._
-import scalaz.Validation
-import scalaz.syntax.validation._
 import com.blackboxsociety.net._
 import scalaz.concurrent._
-import scalaz.concurrent.Future._
+import scalaz.concurrent.Task._
+
+case class HttpParserException(s: String) extends Throwable
 
 object HttpParser extends RegexParsers {
 
@@ -100,13 +100,13 @@ object HttpParser extends RegexParsers {
       )
     }
 
-  def apply(client: TcpClient, previous: String = ""): Future[Validation[String, HttpRequest]] = {
-    client.readAsString() flatMap  { data =>
-      val current = previous + data
+  def apply(client: TcpClient, previous: String = ""): Task[HttpRequest] = {
+    client.readAsString() flatMap { s =>
+      val current = previous + s
       parse(httpParser, current) match {
-        case Success(request, next) => now { request.success }
+        case Success(request, next) => now { request }
         case NoSuccess(error, _)    => "source found$".r findFirstIn error match {
-          case None => now { error.fail }
+          case None => fail(HttpParserException(error))
           case _    => apply(client, current)
         }
       }
