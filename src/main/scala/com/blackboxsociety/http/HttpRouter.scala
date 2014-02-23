@@ -5,7 +5,7 @@ import scalaz.concurrent._
 
 case class HttpRouter(default: Controller, controllers: List[Controller]) {
 
-  def route(request: HttpRequest): Future[HttpResponse] = {
+  def route(request: HttpRequest): Task[HttpResponse] = {
     val found      = controllers.find(_.route.route(request))
     val controller = found.getOrElse(default)
     controller.run(request)

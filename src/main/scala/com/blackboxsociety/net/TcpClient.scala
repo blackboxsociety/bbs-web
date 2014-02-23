@@ -4,19 +4,20 @@ import scalaz.{Reader => _, _}
 import syntax.bind._
 import com.blackboxsociety.services._
 import scalaz.concurrent._
-import Future._
+import scalaz.concurrent.Task._
+import scalaz.syntax.id._
 import java.nio.channels._
 import java.nio._
 import java.nio.charset.Charset
 
 trait TcpClient {
-  def read(): Future[ByteBuffer]
-  def readAsString(): Future[String]
-  def write(b: Array[Byte]): Future[Unit]
-  def write(s: String): Future[Unit]
-  def end(s: String): Future[Unit]
-  def close(): Future[Unit]
-  def close(n: Unit): Future[Unit]
+  def read(): Task[ByteBuffer]
+  def readAsString(): Task[String]
+  def write(b: Array[Byte]): Task[Unit]
+  def write(s: String): Task[Unit]
+  def end(s: String): Task[Unit]
+  def close(): Task[Unit]
+  def close(n: Unit): Task[Unit]
 }
 
 object TcpClient {
@@ -28,19 +29,19 @@ object TcpClient {
 
   private case class TcpClientImpl(s: SocketChannel) extends TcpClient {
 
-    def read(): Future[ByteBuffer] = async { next =>
+    def read(): Task[ByteBuffer] = async { next =>
       EventLoop.addSocketRead(s, { () =>
         val buffer = ByteBuffer.allocate(8192)
         s.read(buffer)
-        next(buffer)
+        next(buffer.right)
       })
     }
 
-    def readAsString(): Future[String] = read map { n =>
+    def readAsString(): Task[String] = read map { n =>
       new String(n.array(), Charset.forName("UTF-8"))
     }
 
-    def write(b: Array[Byte]): Future[Unit] = async { next =>
+    def write(b: Array[Byte]): Task[Unit] = async { next =>
       EventLoop.addSocketWrite(s, { () =>
         val buffer = ByteBuffer.allocate(b.length)
         buffer.clear()
@@ -49,23 +50,23 @@ object TcpClient {
         while(buffer.hasRemaining) {
           s.write(buffer)
         }
-        next()
+        next(\/-(Unit))
       })
     }
 
-    def write(s: String): Future[Unit] = {
+    def write(s: String): Task[Unit] = {
       write(s.getBytes)
     }
 
-    def end(s: String): Future[Unit] = write(s) >>= close
+    def end(s: String): Task[Unit] = write(s) >>= close
 
-    def close(): Future[Unit] = async { next =>
+    def close(): Task[Unit] = async { next =>
       EventLoop.closeChannel(s)
       s.close()
-      next()
+      next(\/-(Unit))
     }
 
-    def close(n: Unit): Future[Unit] = close()
+    def close(n: Unit): Task[Unit] = close()
 
   }
 
