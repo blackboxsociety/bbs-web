@@ -4,12 +4,13 @@ import com.blackboxsociety.services._
 import com.blackboxsociety.util._
 import scalaz.ImmutableArray
 import scalaz.concurrent._
+import scalaz.concurrent.Task._
 import scalaz.syntax.bind._
-import Task._
 import com.blackboxsociety.net._
 import com.blackboxsociety.http._
 import com.blackboxsociety.http.responses._
 import com.blackboxsociety.app.services._
+import java.io._
 
 object Main {
 
@@ -18,8 +19,25 @@ object Main {
     response <- services.router.route(request)
   ) yield response
 
-  def handleError(s: ServiceManifest): PartialFunction[Throwable, HttpResponse] = {
-    case HttpParserException(e) => InternalServerError(e)(s)
+  def servePublicFile(request: HttpRequest)(implicit s: ServiceManifest): Option[HttpResponse] = {
+    if(request.resource.path.startsWith("/assets/")) {
+      val src = "target/public/" + request.resource.path.substring(8)
+      val file = new File(src)
+      if(file.exists() && !src.contains("..")) {
+        Some(Ok(scala.io.Source.fromFile(file).mkString))
+      } else {
+        None
+      }
+    } else {
+      None
+    }
+  }
+
+  def handleError(implicit s: ServiceManifest): PartialFunction[Throwable, HttpResponse] = {
+    case HttpParserException(e)   =>
+      InternalServerError(e)(s)
+    case MissingRouteException(r) =>
+      servePublicFile(r).getOrElse({ Missing("These are not the droids you're looking for :-/") })
   }
 
   def handleRequest(services: ServiceManifest)(client: TcpClient): Task[Unit] = for (
