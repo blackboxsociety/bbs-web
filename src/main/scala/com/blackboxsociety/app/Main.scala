@@ -10,6 +10,7 @@ import com.blackboxsociety.net._
 import com.blackboxsociety.http._
 import com.blackboxsociety.http.responses._
 import com.blackboxsociety.app.services._
+import com.blackboxsociety.util.parser.TcpParserStream._
 import java.io._
 
 object Main {

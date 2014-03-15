@@ -1,11 +1,16 @@
 package com.blackboxsociety.http
 
 import scala.util.parsing.combinator._
-import com.blackboxsociety.net._
 import scalaz.concurrent._
 import scalaz.concurrent.Task._
+import com.blackboxsociety.util.parser.{TcpParserStream, ParserStream}
 
 case class HttpParserException(s: String) extends Throwable
+
+case class ParsedHttpRequest(method:   HttpMethod,
+                             resource: HttpResource,
+                             version:  HttpVersion,
+                             headers:  List[HttpHeader])
 
 object HttpParser extends RegexParsers {
 
@@ -83,16 +88,16 @@ object HttpParser extends RegexParsers {
     case (key ~ _ ~ _ ~ value ~ _) => HttpHeader(key, value)
   }
 
-  def httpParser: Parser[HttpRequest] = httpMethod       ~
-                                        " "              ~
-                                        httpResource     ~
-                                        " "              ~
-                                        httpVersion      ~
-                                        lineEnd          ~
-                                        rep(httpHeader)  ~
-                                        lineEnd          ^^
+  def httpParser: Parser[ParsedHttpRequest] = httpMethod       ~
+                                              " "              ~
+                                              httpResource     ~
+                                              " "              ~
+                                              httpVersion      ~
+                                              lineEnd          ~
+                                              rep(httpHeader)  ~
+                                              lineEnd          ^^
     {
-      case (method ~ _ ~ resource ~ _ ~ version ~ _ ~ headers ~  _) => HttpRequest(
+      case (method ~ _ ~ resource ~ _ ~ version ~ _ ~ headers ~  _) => ParsedHttpRequest(
         method,
         resource,
         version,
@@ -100,14 +105,21 @@ object HttpParser extends RegexParsers {
       )
     }
 
-  def apply(client: TcpClient, previous: String = ""): Task[HttpRequest] = {
-    client.readAsString() flatMap { s =>
-      val current = previous + s
-      parse(httpParser, current) match {
-        case Success(request, next) => now { request }
+  def apply(stream: ParserStream): Task[HttpRequest] = {
+    stream.latest flatMap { s =>
+      parse(httpParser, s.current) match {
+        case Success(request, next) => now {
+          HttpRequest(
+            method   = request.method,
+            resource = request.resource,
+            version  = request.version,
+            headers  = request.headers,
+            body     = s.withText(next.source.toString)
+          )
+        }
         case NoSuccess(error, _)    => "source found$".r findFirstIn error match {
           case None => fail(HttpParserException(error))
-          case _    => apply(client, current)
+          case _    => apply(s)
         }
       }
     }

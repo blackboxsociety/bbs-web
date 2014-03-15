@@ -1,11 +1,13 @@
 package com.blackboxsociety.http
 
 import play.api.libs.json.{JsString, JsObject, Json}
+import com.blackboxsociety.util.parser.ParserStream
 
 case class HttpRequest(method:   HttpMethod,
                        resource: HttpResource,
                        version:  HttpVersion,
-                       headers:  List[HttpHeader])
+                       headers:  List[HttpHeader],
+                       body:     ParserStream)
 {
 
   lazy val session = headers
