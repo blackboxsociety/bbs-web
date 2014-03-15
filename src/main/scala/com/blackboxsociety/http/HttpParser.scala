@@ -114,7 +114,7 @@ object HttpParser extends RegexParsers {
             resource = request.resource,
             version  = request.version,
             headers  = request.headers,
-            body     = s.withText(next.source.toString)
+            body     = s.withText(next.source.toString.substring(next.offset))
           )
         }
         case NoSuccess(error, _)    => "source found$".r findFirstIn error match {
