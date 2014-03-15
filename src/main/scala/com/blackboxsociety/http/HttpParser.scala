@@ -85,7 +85,7 @@ object HttpParser extends RegexParsers {
   def httpVersion: Parser[HttpVersion] = httpVersionLegacy | httpVersionModern
 
   def httpHeader: Parser[HttpHeader] = "[^:\r\n]+".r ~ ":" ~ spaces ~ nonEndings ~ lineEnd ^^ {
-    case (key ~ _ ~ _ ~ value ~ _) => HttpHeader(key, value)
+    case (key ~ _ ~ _ ~ value ~ _) => HttpGenericHeader(key, value)
   }
 
   def httpParser: Parser[ParsedHttpRequest] = httpMethod       ~
