@@ -8,14 +8,14 @@ abstract class HttpResponse(implicit services: ServiceManifest) {
 
   val statusCode: Int
   val body:       String
-  val headers:    List[String]
+  val headers:    List[HttpHeader]
   val session:    Map[String, String]
 
-  def make(c: String, l: List[String], s: Map[String, String]): HttpResponse
+  def make(c: String, l: List[HttpHeader], s: Map[String, String]): HttpResponse
 
-  def withHeader(header: String): HttpResponse = make(body, headers :+ header, session)
+  def withHeader(header: HttpHeader): HttpResponse = make(body, headers :+ header, session)
 
-  def withHeaders(newHeaders: List[String]): HttpResponse = make(body, headers ++ newHeaders, session)
+  def withHeaders(newHeaders: List[HttpHeader]): HttpResponse = make(body, headers ++ newHeaders, session)
 
   def withSession(s: Map[String, String]): HttpResponse = make(body, headers, s)
 
@@ -27,12 +27,13 @@ abstract class HttpResponse(implicit services: ServiceManifest) {
     if (session.size > 0) {
       val json   = Json.toJson(session)
       val signed = Signed.sign(services.sessionSecret, json.toString())
-      withNewSession.withHeader("Set-Cookie: session=" + signed + "; HttpOnly").toString
+      withNewSession.withHeader(SetCookieHeader(s"session=$signed; HttpOnly")).toString
     } else {
       if (headers.size > 0) {
-        s"HTTP/1.1 $statusCode OK\r\n" + headers.head + "\r\n\r\n" + body
+        val serializedHeaders = headers.map(_.toString).mkString("\r\n")
+        s"HTTP/1.1 $statusCode OK\r\n$serializedHeaders\r\n\r\n$body"
       } else {
-        s"HTTP/1.1 $statusCode OK\r\n" + headers.mkString("\r\n") + "\r\n" + body
+        s"HTTP/1.1 $statusCode OK\r\n\r\n" + body
       }
     }
   }
