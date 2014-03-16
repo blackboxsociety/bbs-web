@@ -13,8 +13,6 @@ case class Post(implicit services: ServiceManifest) extends Controller {
   val route = HttpRoute(MethodRoute(HttpPost), PathRoute("/login"))
 
   def action(request: HttpRequest): Task[HttpResponse] = now {
-    println(request)
-    println(request.body.current)
     Ok("Hello from login post")
   }
 
