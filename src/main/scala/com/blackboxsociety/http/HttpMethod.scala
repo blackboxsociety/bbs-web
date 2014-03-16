@@ -1,6 +1,21 @@
 package com.blackboxsociety.http
 
-sealed trait HttpMethod
+sealed trait HttpMethod {
+
+  override def toString = this match {
+    case HttpGet => "GET"
+    case HttpHead => "HEAD"
+    case HttpPost => "POST"
+    case HttpPut => "PUT"
+    case HttpDelete => "DELETE"
+    case HttpTrace => "TRACE"
+    case HttpOptions => "OPTIONS"
+    case HttpConnect => "CONNECT"
+    case HttpPatch => "PATCH"
+  }
+
+}
+
 case object HttpGet     extends HttpMethod
 case object HttpHead    extends HttpMethod
 case object HttpPost    extends HttpMethod

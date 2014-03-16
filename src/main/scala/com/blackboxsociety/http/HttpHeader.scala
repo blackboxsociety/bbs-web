@@ -14,6 +14,7 @@ abstract class HttpBaseHeader(val key: String) extends HttpHeader
 case class AcceptRangesHeader(value: String) extends HttpBaseHeader("Accept-Ranges")
 case class AgeHeader(value: String) extends HttpBaseHeader("Age")
 case class AllowHeader(value: String) extends HttpBaseHeader("Allow")
+case class AuthorizationHeader(value: String) extends HttpBaseHeader("Authorization")
 case class CacheControlHeader(value: String) extends HttpBaseHeader("Cache-Control")
 case class ConnectionHeader(value: String) extends HttpBaseHeader("Connection")
 case class ContentEncodingHeader(value: String) extends HttpBaseHeader("Content-Encoding")
