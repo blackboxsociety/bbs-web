@@ -3,7 +3,8 @@ package com.blackboxsociety.http
 import scala.util.parsing.combinator._
 import scalaz.concurrent._
 import scalaz.concurrent.Task._
-import com.blackboxsociety.util.parser.{TcpParserStream, ParserStream}
+import com.blackboxsociety.util.parser._
+import com.blackboxsociety.util._
 
 case class HttpParserException(s: String) extends Throwable
 
@@ -106,23 +107,39 @@ object HttpParser extends RegexParsers {
     }
 
   def apply(stream: ParserStream): Task[HttpRequest] = {
-    stream.latest flatMap { s =>
-      parse(httpParser, s.current) match {
-        case Success(request, next) => now {
-          HttpRequest(
-            method   = request.method,
-            resource = request.resource,
-            version  = request.version,
-            headers  = request.headers,
-            body     = s.withText(next.source.toString.substring(next.offset))
-          )
+    stream.latest flatMap { f =>
+      f.current match {
+        case More(s) => parse(httpParser, s) match {
+          case Success(request, next) =>
+            finishWithSuccess(stream, request, next, Finishable.more)
+          case NoSuccess(error, _)    => "source found$".r findFirstIn error match {
+            case None => fail(HttpParserException(error))
+            case _    => apply(f)
+          }
         }
-        case NoSuccess(error, _)    => "source found$".r findFirstIn error match {
-          case None => fail(HttpParserException(error))
-          case _    => apply(s)
+        case Done(s) => parse(httpParser, s) match {
+          case Success(request, next) =>
+            finishWithSuccess(stream, request, next, Finishable.done)
+          case NoSuccess(error, _)    => "source found$".r findFirstIn error match {
+            case None => fail(HttpParserException("wat"/*error*/))
+            case _    => fail(HttpParserException("Received an incomplete HTTP request."))
+          }
         }
       }
     }
+  }
+
+  private def finishWithSuccess(stream: ParserStream,
+                                req: ParsedHttpRequest,
+                                next: HttpParser.Input,
+                                f: String => Finishable[String]): Task[HttpRequest] = now {
+    HttpRequest(
+      method   = req.method,
+      resource = req.resource,
+      version  = req.version,
+      headers  = req.headers,
+      body     = stream.withText(f(next.source.toString.substring(next.offset)))
+    )
   }
 
 }

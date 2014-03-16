@@ -1,7 +1,7 @@
 package com.blackboxsociety.net
 
 import scalaz.{Reader => _, _}
-import syntax.bind._
+import scalaz.syntax.bind._
 import com.blackboxsociety.services._
 import scalaz.concurrent._
 import scalaz.concurrent.Task._
@@ -9,10 +9,11 @@ import scalaz.syntax.id._
 import java.nio.channels._
 import java.nio._
 import java.nio.charset.Charset
+import com.blackboxsociety.util._
 
 trait TcpClient {
-  def read(): Task[ByteBuffer]
-  def readAsString(): Task[String]
+  def read(): Task[Finishable[ByteBuffer]]
+  def readAsString(): Task[Finishable[String]]
   def write(b: Array[Byte]): Task[Unit]
   def write(s: String): Task[Unit]
   def end(s: String): Task[Unit]
@@ -29,16 +30,18 @@ object TcpClient {
 
   private case class TcpClientImpl(s: SocketChannel) extends TcpClient {
 
-    def read(): Task[ByteBuffer] = async { next =>
+    def read(): Task[Finishable[ByteBuffer]] = async { next =>
       EventLoop.addSocketRead(s, { () =>
         val buffer = ByteBuffer.allocate(8192)
-        s.read(buffer)
-        next(buffer.right)
+        s.read(buffer) match {
+          case -1 => next(Done(buffer).right)
+          case _  => next(More(buffer).right)
+        }
       })
     }
 
-    def readAsString(): Task[String] = read map { n =>
-      new String(n.array(), Charset.forName("UTF-8"))
+    def readAsString(): Task[Finishable[String]] = read map { n =>
+      n map { b => new String(b.array(), Charset.forName("UTF-8")) }
     }
 
     def write(b: Array[Byte]): Task[Unit] = async { next =>
