@@ -22,7 +22,7 @@ object Main {
 
   def servePublicFile(request: HttpRequest)(implicit s: ServiceManifest): Option[HttpResponse] = {
     if(request.resource.path.startsWith("/assets/")) {
-      val src = "target/public/" + request.resource.path.substring(8)
+      val src = "target/scala-2.10/resource_managed/main/public/" + request.resource.path.substring(8)
       val file = new File(src)
       if(file.exists() && !src.contains("..")) {
         Some(Ok(scala.io.Source.fromFile(file).mkString))

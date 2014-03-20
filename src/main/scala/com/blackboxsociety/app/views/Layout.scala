@@ -13,6 +13,7 @@ trait Layout extends HtmlView {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content="Spreading and connecting information" />
         <link rel="stylesheet" type="text/css" href="/assets/css/main.css" />
+        <script type="text/javascript" src="/assets/javascript/main.js"></script>
         <title>Black Box Society</title>
       </head>
       <body>
