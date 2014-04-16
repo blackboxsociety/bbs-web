@@ -2,6 +2,8 @@ package com.blackboxsociety.http
 
 import play.api.libs.json.{JsString, JsObject, Json}
 import com.blackboxsociety.util.parser.ParserStream
+import scalaz.concurrent.Task
+import com.blackboxsociety.util.{More, Done}
 
 case class HttpRequest(method:   HttpMethod,
                        resource: HttpResource,
@@ -30,5 +32,16 @@ case class HttpRequest(method:   HttpMethod,
       case _ => None
     })
     .getOrElse(Map())
+
+  def getBody(ps: ParserStream = body): Task[String] = {
+    ps.latest.flatMap { p => (
+      p.current match {
+        case Done(d: String) =>
+          Task.now{d}
+        case More(m: String) =>
+          getBody(p)
+      }
+    )}
+  }
 
 }
