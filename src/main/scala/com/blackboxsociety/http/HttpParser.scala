@@ -25,6 +25,10 @@ object HttpParser extends RegexParsers {
 
   def nonEndings = "[^\r\n]+".r
 
+  def queryString: Parser[String] = "?" ~ nonSpaces ^^ {
+    case(qm ~ q) => q
+  }
+
   def httpGet: Parser[HttpMethod] = "GET" ^^ { _ =>
     HttpGet
   }
@@ -61,8 +65,8 @@ object HttpParser extends RegexParsers {
     HttpPatch
   }
 
-  def httpResource: Parser[HttpResource] = nonSpaces ^^ { n =>
-    HttpResource(n)
+  def httpResource: Parser[HttpResource] = """/[^ ?]+""".r ~ opt(queryString) ^^ {
+    case(r ~ q) => HttpResource(r, q)
   }
 
   def httpMethod: Parser[HttpMethod] = httpGet     |
