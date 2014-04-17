@@ -24,9 +24,9 @@ object HttpParser extends RegexParsers {
   def lineEnd = "\r\n"
 
   def nonEndings = "[^\r\n]+".r
-
+  
   def queryString: Parser[String] = "?" ~ nonSpaces ^^ {
-    case(qm ~ q) => q
+    case(s ~ q) => q
   }
 
   def httpGet: Parser[HttpMethod] = "GET" ^^ { _ =>
@@ -65,8 +65,8 @@ object HttpParser extends RegexParsers {
     HttpPatch
   }
 
-  def httpResource: Parser[HttpResource] = """/[^ ?]+""".r ~ opt(queryString) ^^ {
-    case(r ~ q) => HttpResource(r, q)
+  def httpResource: Parser[HttpResource] = """[A-Za-z0-9/_.-]+""".r ~ opt(queryString) ^^ {
+    case (r ~ q) => HttpResource(r, q)
   }
 
   def httpMethod: Parser[HttpMethod] = httpGet     |

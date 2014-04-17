@@ -13,9 +13,13 @@ case class HttpResource(path: String, queryString: Option[String]) {
 object HttpResource {
 
   def queryStringToMap(q: String): Map[String, String] = {
-    def ands = q.split("&")
-    def es: Array[Array[String]] = ands.map(_.split("="))
-    es.map(s => (s(0), s(1))).toMap
+    if(q == "") {
+      Map()
+    } else {
+      def ands = q.split("&")
+      def es: Array[Array[String]] = ands.map(_.split("="))
+      es.map(s => (s(0), s(1))).toMap
+    }
   }
 
 }
