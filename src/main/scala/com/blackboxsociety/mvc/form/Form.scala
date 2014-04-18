@@ -1,12 +1,20 @@
 package com.blackboxsociety.mvc.form
 
-import com.blackboxsociety.util.parser.QueryStringParser
-import com.blackboxsociety.http.HttpRequest
+import com.blackboxsociety.util.parser.{BodyParser, QueryStringParser}
+import com.blackboxsociety.http.{HttpResource, HttpRequest}
+import scalaz.concurrent.Task
 
-case class Form(fields: Seq[FormField]) extends QueryStringParser[Form] {
+case class Form(fields: Seq[FormField]) extends BodyParser[Form] with QueryStringParser[Form] {
 
   def fromQueryString(request: HttpRequest): Form = {
     this.copy(fields = fields.map(f => f.copy(value = request.resource.getParam(f.key))))
+  }
+
+  def fromBody(request: HttpRequest): Task[Form] = {
+    request.getBody().map { s =>
+      val m = HttpResource.queryStringToMap(s)
+      this.copy(fields = fields.map(f => f.copy(value = m.get(f.key))))
+    }
   }
 
   def apply(key: String): Option[String] = {
@@ -21,7 +29,7 @@ case class Form(fields: Seq[FormField]) extends QueryStringParser[Form] {
     fields.map(f => FormError(f, f.error.getOrElse(""))).filter(_.field.hasError())
   }
 
-  def run[A](success: Form => A, failure: Form => A): A = {
+  def fold[A](success: Form => A, failure: Form => A): A = {
     val check = fields.map(_.test())
 
     val hasErrors = check.foldLeft(false)((b, f) => b || f.hasError)
