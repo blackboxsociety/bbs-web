@@ -7,13 +7,14 @@ import scalaz.concurrent._
 import scalaz.concurrent.Task._
 import com.blackboxsociety.http.responses._
 import com.blackboxsociety.app.services._
+import com.blackboxsociety.app.views.Login
 
 case class Get(implicit services: ServiceManifest) extends Controller {
 
   val route = HttpRoute(MethodRoute(HttpGet), PathRoute("/login"))
 
   def action(request: HttpRequest): Task[HttpResponse] = now {
-    Ok("Hello from login")
+    Ok(Login())
   }
 
 }

@@ -1,3 +1,13 @@
 package com.blackboxsociety.http
 
-case class HttpResource(path: String)
+import com.blackboxsociety.util.parser.QueryStringParser
+
+case class HttpResource(path: String, queryString: Option[String]) {
+
+  val queryParams: Map[String, String] = QueryStringParser.queryStringToMap(queryString.getOrElse(""))
+
+  def getParam(key: String): Option[String] = {
+    queryParams.get(key)
+  }
+
+}

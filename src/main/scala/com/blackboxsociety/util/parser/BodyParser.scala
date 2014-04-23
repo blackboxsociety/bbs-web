@@ -9,11 +9,6 @@ trait BodyParser[A] {
 
 }
 
-trait QueryStringParser[A] {
-
-  def fromQueryString(request: HttpRequest): A
-
-}
 
 
 
