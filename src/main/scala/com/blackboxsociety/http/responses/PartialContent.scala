@@ -1,14 +1,13 @@
 package com.blackboxsociety.http.responses
 
-import com.blackboxsociety.http.{HttpHeader, HttpResponse}
+import com.blackboxsociety.http.{SignedSession, HttpHeader, HttpResponse}
 import com.blackboxsociety.app.services.ServiceManifest
 
 case class PartialContent(body: String,
                           headers: List[HttpHeader] = List(),
-                          session: Map[String, String] = Map())
-                         (implicit services: ServiceManifest) extends HttpResponse
+                          session: Option[SignedSession] = None) extends HttpResponse
 {
   val statusCode: Int = 206
-  def make(body: String, headers: List[HttpHeader], session: Map[String, String]) =
+  def make(body: String, headers: List[HttpHeader], session: Option[SignedSession]) =
     PartialContent(body, headers, session)
 }

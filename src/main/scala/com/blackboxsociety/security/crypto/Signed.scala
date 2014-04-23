@@ -3,7 +3,7 @@ package com.blackboxsociety.security.crypto
 object Signed {
 
   def sign(secret: String, text: String): String =
-    Hash.hmacSha256(secret, text) + text
+    Hash.hmacSha256(secret, text)
 
   def verify(secret: String, signed: String): Option[String] = {
     val text      = signed.drop(64)

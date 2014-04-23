@@ -36,7 +36,7 @@ object Main {
 
   def handleError(implicit s: ServiceManifest): PartialFunction[Throwable, HttpResponse] = {
     case HttpParserException(e)   =>
-      InternalServerError(e)(s)
+      InternalServerError(e)
     case MissingRouteException(r) =>
       servePublicFile(r).getOrElse({ Missing("These are not the droids you're looking for :-/") })
   }
