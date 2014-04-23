@@ -12,7 +12,7 @@ case class Form(fields: Seq[FormField]) extends BodyParser[Form] with QueryStrin
 
   def fromBody(request: HttpRequest): Task[Form] = {
     request.getBody().map { s =>
-      val m = HttpResource.queryStringToMap(s)
+      val m = QueryStringParser.queryStringToMap(s)
       this.copy(fields = fields.map(f => f.copy(value = m.get(f.key))))
     }
   }
@@ -29,7 +29,7 @@ case class Form(fields: Seq[FormField]) extends BodyParser[Form] with QueryStrin
     fields.map(f => FormError(f, f.error.getOrElse(""))).filter(_.field.hasError())
   }
 
-  def fold[A](success: Form => A, failure: Form => A): A = {
+  def validate[A](success: Form => A, failure: Form => A): A = {
     val check = fields.map(_.test())
 
     val hasErrors = check.foldLeft(false)((b, f) => b || f.hasError)
@@ -42,8 +42,6 @@ case class Form(fields: Seq[FormField]) extends BodyParser[Form] with QueryStrin
 
 }
 
-case class FormError(field: FormField, error: String)
-
 case class FormField(key: String, value: Option[String] = None, constraint: FormConstraint, error: Option[String] = None) {
 
   def hasError(): Boolean = !error.isEmpty
@@ -52,25 +50,6 @@ case class FormField(key: String, value: Option[String] = None, constraint: Form
     value.map { v =>
       this.copy(error = constraint.run(v).find(_._2 != None).flatMap(_._2))
     }.getOrElse(this.copy(error = Some(s"$key undefined")))
-  }
-
-}
-
-case class FormConstraint(constraints: List[(String => Boolean, String)] = List()) {
-
-  def run(value: String): List[(Boolean, Option[String])] = {
-    constraints.map(c => {
-      val t = c._1(value)
-      if(t) {
-        (t, None)
-      } else {
-        (t, Some(c._2))
-      }
-    })
-  }
-
-  def restrict(test: String => Boolean, error: String): FormConstraint = {
-    this.copy(constraints.::(test -> error))
   }
 
 }

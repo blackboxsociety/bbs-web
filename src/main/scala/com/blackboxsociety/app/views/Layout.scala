@@ -38,3 +38,14 @@ case class Home() extends Layout {
   def container: Elem = <h1 class="blue">Welcome to black box society!</h1>
 
 }
+
+case class Login() extends Layout {
+
+  def container: Elem =
+    <form method="POST" action="/login">
+      <input type="text" name="username"/>
+      <input type="password" name="password"/>
+      <input type="submit" value="Submit"/>
+    </form>
+
+}
