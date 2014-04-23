@@ -1,33 +1,28 @@
 package com.blackboxsociety.http
 
-import com.blackboxsociety.app.services.ServiceManifest
 import play.api.libs.json.Json
-import com.blackboxsociety.security.crypto.Signed
+import com.blackboxsociety.security.crypto.{SignedMap, Signed}
 
-abstract class HttpResponse(implicit services: ServiceManifest) {
+abstract class HttpResponse {
 
   val statusCode: Int
   val body:       String
   val headers:    List[HttpHeader]
-  val session:    Map[String, String]
+  val session:    Option[SignedSession]
 
-  def make(c: String, l: List[HttpHeader], s: Map[String, String]): HttpResponse
+  def make(c: String, l: List[HttpHeader], s: Option[SignedSession]): HttpResponse
 
   def withHeader(header: HttpHeader): HttpResponse = make(body, headers :+ header, session)
 
   def withHeaders(newHeaders: List[HttpHeader]): HttpResponse = make(body, headers ++ newHeaders, session)
 
-  def withSession(s: Map[String, String]): HttpResponse = make(body, headers, s)
-
-  def withSession(s: (String, String)*): HttpResponse = make(body, headers, s.groupBy(_._1).mapValues(_.head._2))
-
-  def withNewSession: HttpResponse = make(body, headers, Map())
+  def withSession(s: SignedSession): HttpResponse = make(body, headers, Some(s))
 
   override def toString: String = {
-    if (session.size > 0) {
-      val json   = Json.toJson(session)
-      val signed = Signed.sign(services.sessionSecret, json.toString())
-      withNewSession.withHeader(SetCookieHeader(s"session=$signed; HttpOnly")).toString
+    if (session.nonEmpty && session.get.data.size > 0) { // bad code will be refactored in issue #37
+      val json   = Json.toJson(session.get.data)
+      val signed = session.get.signature()
+      withSession(session.get.clear()).withHeader(SetCookieHeader(s"session=$signed$json; HttpOnly")).toString
     } else {
       if (headers.size > 0) {
         val serializedHeaders = headers.map(_.toString).mkString("\r\n")

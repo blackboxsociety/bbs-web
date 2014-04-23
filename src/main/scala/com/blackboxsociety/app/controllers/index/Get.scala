@@ -14,7 +14,9 @@ case class Get(implicit services: ServiceManifest) extends Controller {
   val route = HttpRoute(MethodRoute(HttpGet), PathRoute("/"))
 
   def action(request: HttpRequest): Task[HttpResponse] = now {
-    Ok(Home()).withSession("key" -> "value", "no" -> "srs")
+    val session = request.session(services.sessionSecret)
+                         .withFreshData(Map("key" -> "value", "no" -> "srs"))
+    Ok(Home()).withSession(session)
   }
 
 }
