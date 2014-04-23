@@ -24,15 +24,34 @@ case class HttpRequest(method:   HttpMethod,
     SignedSession(secret, map)
   }
 
-  def getBody(ps: ParserStream = body): Task[String] = {
-    ps.latest.flatMap { p =>
+  def contentLength(): Option[Int] = {
+    headers.find(h => h.key == "Content-Length").map(_.value.toInt)
+  }
+
+  def getBody(): Task[String] = {
+    body.current match {
+      case Done(d: String) =>
+        Task.now{d}
+      case More(m: String) =>
+        this.contentLength().map { l =>
+          if(m.length > l) {
+            Task.now{m}
+          } else {
+            readBody(body)
+          }
+        }.getOrElse(readBody(body))
+    }
+  }
+
+  private def readBody(ps: ParserStream): Task[String] = {
+    ps.latest.flatMap { p => {
       p.current match {
         case Done(d: String) =>
           Task.now{d}
         case More(m: String) =>
-          getBody(p)
-      }
-    }
+          readBody(p)
+        }
+    }}
   }
 
 }

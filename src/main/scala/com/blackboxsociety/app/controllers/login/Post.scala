@@ -7,13 +7,23 @@ import scalaz.concurrent._
 import scalaz.concurrent.Task._
 import com.blackboxsociety.http.responses._
 import com.blackboxsociety.app.services._
+import com.blackboxsociety.mvc.form.{Form, FormConstraint}
 
 case class Post(implicit services: ServiceManifest) extends Controller {
 
   val route = HttpRoute(MethodRoute(HttpPost), PathRoute("/login"))
 
-  def action(request: HttpRequest): Task[HttpResponse] = now {
-    Ok("Hello from login post")
+  val usernameC = FormConstraint().restrict(s => s.length > 3, "too short").restrict(s => s == "master", "you are not master")
+  val passwordC = FormConstraint().restrict(s => !s.contains("123"), "contains 123")
+
+  def action(request: HttpRequest): Task[HttpResponse] = {
+    val f = Form.form("username" -> usernameC, "password" -> passwordC).fromBody(request)
+    f.map(t =>
+      t.validate(
+        success => Ok("win bro"),
+        errors => Ok("no win")
+      )
+    )
   }
 
 }
