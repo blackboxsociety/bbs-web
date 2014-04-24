@@ -8,7 +8,6 @@ import scalaz.concurrent.Task._
 import scalaz.syntax.bind._
 import com.blackboxsociety.net._
 import com.blackboxsociety.http._
-import com.blackboxsociety.http.responses._
 import com.blackboxsociety.app.services._
 import com.blackboxsociety.util.parser.TcpParserStream._
 import java.io._
