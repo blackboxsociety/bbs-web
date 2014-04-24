@@ -6,6 +6,7 @@ import com.blackboxsociety.util.{More, Done}
 import com.blackboxsociety.security.crypto.SignedMap
 import com.blackboxsociety.http.routes.{RegexPathRoute, HttpRouteRule}
 import scala.util.matching.Regex
+import com.blackboxsociety.app.services.ServiceManifest
 
 case class HttpRequest(method:   HttpMethod,
                        resource: HttpResource,
@@ -15,12 +16,12 @@ case class HttpRequest(method:   HttpMethod,
                        pathVars: Map[String, String] = Map())
 {
 
-  def session(secret: String): SignedSession = {
-    SignedSession(secret, readSignedCookie(secret, "session"))
+  def session()(implicit services: ServiceManifest): SignedSession = {
+    SignedSession(services.sessionSecret, readSignedCookie(services.sessionSecret, "session"))
   }
 
-  def flash(secret: String): FlashSession = {
-    FlashSession(secret, readSignedCookie(secret, "flash"))
+  def flash()(implicit services: ServiceManifest): FlashSession = {
+    FlashSession(services.sessionSecret, readSignedCookie(services.sessionSecret, "flash"))
   }
 
   private def readSignedCookie(key: String, secret: String): Map[String, String] = {
