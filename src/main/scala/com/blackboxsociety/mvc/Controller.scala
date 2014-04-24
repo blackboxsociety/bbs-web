@@ -6,6 +6,8 @@ import scalaz.concurrent._
 
 trait Controller {
 
+  val number = """(\d+)"""
+
   val route: HttpRouteRule
 
   def middleware: List[(HttpRequest => Task[HttpResponse]) => (HttpRequest => Task[HttpResponse])] = List()

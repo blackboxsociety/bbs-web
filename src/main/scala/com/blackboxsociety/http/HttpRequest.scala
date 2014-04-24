@@ -4,12 +4,15 @@ import com.blackboxsociety.util.parser.ParserStream
 import scalaz.concurrent.Task
 import com.blackboxsociety.util.{More, Done}
 import com.blackboxsociety.security.crypto.SignedMap
+import com.blackboxsociety.http.routes.{RegexPathRoute, HttpRouteRule}
+import scala.util.matching.Regex
 
 case class HttpRequest(method:   HttpMethod,
                        resource: HttpResource,
                        version:  HttpVersion,
                        headers:  List[HttpHeader],
-                       body:     ParserStream)
+                       body:     ParserStream,
+                       pathVars: Map[String, String] = Map())
 {
 
   def session(secret: String): SignedSession = {
@@ -22,6 +25,10 @@ case class HttpRequest(method:   HttpMethod,
       .flatMap(SignedMap.verify(secret, _))
       .getOrElse(Map())
     SignedSession(secret, map)
+  }
+
+  def getPathVar(key: String): Option[String] = {
+    pathVars.get(key)
   }
 
   def contentLength(): Option[Int] = {

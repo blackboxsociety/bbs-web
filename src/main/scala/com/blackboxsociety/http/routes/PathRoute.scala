@@ -4,6 +4,11 @@ import com.blackboxsociety.http._
 
 case class PathRoute(path: String) extends HttpRouteRule {
 
-  def route(request: HttpRequest): Boolean = request.resource.path == path
+  def route(request: HttpRequest): Option[HttpRequest] = {
+    if(request.resource.path == path)
+      Some(request)
+    else
+      None
+  }
 
 }
