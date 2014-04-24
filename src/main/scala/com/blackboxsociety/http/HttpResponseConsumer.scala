@@ -5,11 +5,12 @@ object HttpResponseConsumer {
   def consume(response: HttpResponse): String = {
     val statusLine        = genStatusLine(response)
     val headerLines       = genHeaderLines(response)
-    val sessionLines      = genSessionHeaderLines(response).getOrElse("")
+    val sessionLine       = genSessionHeaderLines(response).getOrElse("")
+    val flashLine         = genFlashHeaderLines(response)
     val contentLengthLine = genContentLengthLine(response)
     val bodyClause        = genBody(response)
 
-    s"$statusLine$headerLines$sessionLines$contentLengthLine$bodyClause"
+    s"$statusLine$headerLines$sessionLine$flashLine$contentLengthLine$bodyClause"
   }
 
   private def genStatusLine(response: HttpResponse): String = {
@@ -26,7 +27,18 @@ object HttpResponseConsumer {
 
   private def genSessionHeaderLines(response: HttpResponse): Option[String] = {
     response.session map { s =>
-      SetCookieHeader(s"session=${s.signature()}${s.toJson}; HttpOnly").toString + "\r\n"
+      SetCookieHeader(s"session=${s.signature()}${s.toJson}; Path=/; HttpOnly").toString + "\r\n"
+    }
+  }
+
+  private def genFlashHeaderLines(response: HttpResponse): String = {
+    response.flash match {
+      case Some(f) => SetCookieHeader(s"flash=${f.signature()}${f.toJson}; Path=/; HttpOnly").toString + "\r\n"
+      case None    =>
+        if (response.statusCode == 404 || response.statusCode == 500) // TODO: this is hacky should be more specific
+          ""
+        else
+          SetCookieHeader(s"flash=none; Path=/; HttpOnly").toString + "\r\n"
     }
   }
 

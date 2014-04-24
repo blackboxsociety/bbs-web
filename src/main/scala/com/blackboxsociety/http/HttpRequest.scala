@@ -16,15 +16,22 @@ case class HttpRequest(method:   HttpMethod,
 {
 
   def session(secret: String): SignedSession = {
-    val map = headers
+    SignedSession(secret, readSignedCookie(secret, "session"))
+  }
+
+  def flash(secret: String): FlashSession = {
+    FlashSession(secret, readSignedCookie(secret, "flash"))
+  }
+
+  private def readSignedCookie(key: String, secret: String): Map[String, String] = {
+    headers
       .filter(_.key == "Cookie")
       .map({ n => Cookie.parse(n.value) })
       .filter(_.size > 0)
-      .find(_.exists({ case (k, _) => k == "session" }))
-      .flatMap(_.get("session"))
+      .find(_.exists({ case (k, _) => k == key }))
+      .flatMap(_.get(key))
       .flatMap(SignedMap.verify(secret, _))
       .getOrElse(Map())
-    SignedSession(secret, map)
   }
 
   def getPathVar(key: String): Option[String] = {
