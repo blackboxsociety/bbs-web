@@ -9,7 +9,8 @@ trait CommonRoutesComponent extends RoutesComponent { self: ServiceManifest =>
   val router = HttpRouter(
     com.blackboxsociety.app.controllers.index.Get()(this),
     com.blackboxsociety.app.controllers.login.Get()(this),
-    com.blackboxsociety.app.controllers.login.Post()(this)
+    com.blackboxsociety.app.controllers.login.Post()(this),
+    com.blackboxsociety.app.controllers.user.Get()(this)
   )
 
 }

@@ -4,6 +4,6 @@ import com.blackboxsociety.http._
 
 trait HttpRouteRule {
 
-  def route(request: HttpRequest): Boolean
+  def route(request: HttpRequest): Option[HttpRequest]
 
 }
