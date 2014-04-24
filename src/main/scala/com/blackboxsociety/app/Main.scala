@@ -43,7 +43,7 @@ object Main {
 
   def handleRequest(services: ServiceManifest)(client: TcpClient): Task[Unit] = for (
     response <- parseAndRoute(services, client).handle(handleError(services));
-    _        <- client.end(response.toString)
+    _        <- client.end(HttpResponseConsumer.consume(response))
   ) yield ()
 
   def genServer(services: ServiceManifest): Task[Unit] = for (
