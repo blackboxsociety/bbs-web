@@ -1,6 +1,6 @@
 package com.blackboxsociety.app.services
 
-import com.blackboxsociety.app.services.interfaces._
+import com.blackboxsociety.app.services.interfaces.{SessionComponent, RoutesComponent}
 
 trait   ServiceManifest
 extends RoutesComponent
