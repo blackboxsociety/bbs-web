@@ -12,8 +12,14 @@ trait Controller {
 
   def middleware: List[(HttpRequest => Task[HttpResponse]) => (HttpRequest => Task[HttpResponse])] = List()
 
-  val run = middleware.reverse.foldLeft[HttpRequest => Task[HttpResponse]](action) { (m, n) =>
+  def standardMiddleware = mark _ :: middleware
+
+  val run = standardMiddleware.reverse.foldLeft[HttpRequest => Task[HttpResponse]](action) { (m, n) =>
     n(m)
+  }
+
+  def mark(next: HttpRequest => Task[HttpResponse]): HttpRequest => Task[HttpResponse] = { (request) =>
+    next(request) map { response => response.markFromController() }
   }
 
   def action(request: HttpRequest): Task[HttpResponse]

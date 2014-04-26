@@ -35,10 +35,10 @@ object HttpResponseConsumer {
     response.flash match {
       case Some(f) => SetCookieHeader(s"flash=${f.signature()}${f.toJson}; Path=/; HttpOnly").toString + "\r\n"
       case None    =>
-        if (response.statusCode == 404 || response.statusCode == 500) // TODO: this is hacky should be more specific
-          ""
-        else
+        if (response.fromController)
           SetCookieHeader(s"flash=none; Path=/; HttpOnly").toString + "\r\n"
+        else
+          ""
     }
   }
 
