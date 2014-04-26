@@ -15,12 +15,12 @@ import com.blackboxsociety.http.MissingRouteException
 import com.blackboxsociety.http.Ok
 import com.blackboxsociety.http.Missing
 import scala.Some
-import com.blackboxsociety.app.services.{DevServices}
 
 trait BlackBox {
 
-  val port: Int
-  val host: String
+  def port: Int
+
+  def host: String
   
   def router: HttpRouter
 
@@ -28,6 +28,10 @@ trait BlackBox {
 
   lazy val handleRequest = middleware.reverse.foldLeft[HttpRequest => Task[HttpResponse]](route) { (m, n) =>
     n(m)
+  }
+
+  final def main(args: Array[String]) {
+    run(ImmutableArray.fromArray(args))
   }
 
   def route(request: HttpRequest): Task[HttpResponse] = router.route(request)
