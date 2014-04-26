@@ -24,9 +24,17 @@ trait BlackBox {
   
   def router: HttpRouter
 
+  def middleware: List[(HttpRequest => Task[HttpResponse]) => (HttpRequest => Task[HttpResponse])] = List()
+
+  lazy val handleRequest = middleware.reverse.foldLeft[HttpRequest => Task[HttpResponse]](route) { (m, n) =>
+    n(m)
+  }
+
+  def route(request: HttpRequest): Task[HttpResponse] = router.route(request)
+
   def genServer(): Task[Unit] = for (
     server <- TcpServer(host, port);
-    _      <- Concurrency.forkForever(server.accept() >>= handleRequest)
+    _      <- Concurrency.forkForever(server.accept() >>= handleConnection)
   ) yield ()
 
   def servePublicFile(request: HttpRequest): Option[HttpResponse] = {
@@ -43,7 +51,7 @@ trait BlackBox {
     }
   }
 
-  def handleRequest(client: TcpClient): Task[Unit] = for (
+  def handleConnection(client: TcpClient): Task[Unit] = for (
     response <- parseAndRoute(client).handle(handleError());
     _        <- client.end(HttpResponseConsumer.consume(response))
   ) yield ()
@@ -57,7 +65,7 @@ trait BlackBox {
 
   def parseAndRoute(client: TcpClient): Task[HttpResponse] = for (
     request  <- HttpParser(client);
-    response <- router.route(request)
+    response <- handleRequest(request)
   ) yield response
 
   def run(args: ImmutableArray[String]) = {
