@@ -15,10 +15,10 @@ object Build extends Build {
     //scalacOptions       += "-feature",
     //scalacOptions       += "-deprecation",
     resolvers           += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
-    libraryDependencies += "org.scalaz"        %% "scalaz-core" % "7.0.5",
-    libraryDependencies += "org.scalaz"        %% "scalaz-effect" % "7.0.5",
-    libraryDependencies += "org.scalaz"        %% "scalaz-concurrent" % "7.0.5",
-    libraryDependencies += "org.scalaz"        %% "scalaz-iteratee" % "7.0.5",
+    libraryDependencies += "org.scalaz"        %% "scalaz-core" % "7.0.6",
+    libraryDependencies += "org.scalaz"        %% "scalaz-effect" % "7.0.6",
+    libraryDependencies += "org.scalaz"        %% "scalaz-concurrent" % "7.0.6",
+    libraryDependencies += "org.scalaz"        %% "scalaz-iteratee" % "7.0.6",
     libraryDependencies += "com.typesafe.play" % "play-json_2.10" % "2.2.0-RC1"
   )
 
