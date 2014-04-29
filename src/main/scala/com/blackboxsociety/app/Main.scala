@@ -3,11 +3,13 @@ package com.blackboxsociety.app
 import com.blackboxsociety.services._
 import com.blackboxsociety.app.services._
 import com.blackboxsociety.app.middleware.global._
+import com.blackboxsociety.mvc.middleware.global._
 
 object Main extends BlackBox {
 
   override def middleware = List(
-    RequestLoggerMiddleware()
+    RequestLoggerMiddleware(),
+    StaticFileMiddleware("/assets/", "target/resource_managed/main/public/")
   )
 
   override def port: Int = 3000
