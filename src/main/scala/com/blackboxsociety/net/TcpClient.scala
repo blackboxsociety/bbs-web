@@ -10,6 +10,7 @@ import java.nio.channels._
 import java.nio._
 import java.nio.charset.Charset
 import com.blackboxsociety.util._
+import java.io.IOException
 
 trait TcpClient {
   def read(): Task[Finishable[ByteBuffer]]
@@ -48,15 +49,25 @@ object TcpClient {
     }
 
     def write(b: Array[Byte]): Task[Unit] = async { next =>
+      val buffer = ByteBuffer.allocate(b.length)
+      buffer.clear()
+      buffer.put(b)
+      buffer.flip()
+      write(buffer).runAsync(next)
+    }
+
+    def write(b: ByteBuffer): Task[Unit] = async { next =>
       EventLoop.addSocketWrite(s, { () =>
-        val buffer = ByteBuffer.allocate(b.length)
-        buffer.clear()
-        buffer.put(b)
-        buffer.flip()
-        while(buffer.hasRemaining) {
-          s.write(buffer)
+        try {
+          s.write(b)
+          if (b.hasRemaining) {
+            write(b).runAsync(next)
+          } else {
+            next(\/-(Unit))
+          }
+        } catch {
+          case e: IOException => close().runAsync({ _ => next(-\/(e))})
         }
-        next(\/-(Unit))
       })
     }
 
@@ -67,12 +78,16 @@ object TcpClient {
     def write(c: FileChannel, o: Long = 0): Task[Unit] = async { next =>
       EventLoop.addSocketWrite(s, { () =>
         val size = c.size()
-        val sent = c.transferTo(o, size, s)
-        val rem  = o + sent
-        if (rem < c.size()) {
-          write(c, rem).runAsync(next)
-        } else {
-          next(\/-(Unit))
+        try {
+          val sent = c.transferTo(o, size, s)
+          val rem  = o + sent
+          if (rem < c.size()) {
+            write(c, rem).runAsync(next)
+          } else {
+            next(\/-(Unit))
+          }
+        } catch {
+          case e: IOException => close().runAsync({ _ => next(-\/(e))})
         }
       })
     }

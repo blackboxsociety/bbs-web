@@ -35,20 +35,6 @@ trait BlackBox {
     _      <- Concurrency.forkForever(server.accept() >>= handleConnection)
   ) yield ()
 
-  def servePublicFile(request: HttpRequest): Option[HttpResponse] = {
-    if(request.resource.path.startsWith("/assets/")) {
-      val src = "target/resource_managed/main/public/" + request.resource.path.substring(8)
-      val file = new File(src)
-      if(file.exists() && !src.contains("..")) {
-        Some(Ok(new RandomAccessFile(file, "r").getChannel))
-      } else {
-        None
-      }
-    } else {
-      None
-    }
-  }
-
   def handleConnection(client: TcpClient): Task[Unit] = for (
     response <- parseAndRoute(client).handle(handleError());
     _        <- HttpResponseConsumer.consume(client, response)
@@ -58,7 +44,7 @@ trait BlackBox {
     case HttpParserException(e)   =>
       InternalServerError(e)
     case MissingRouteException(r) =>
-      servePublicFile(r).getOrElse({ Missing("These are not the droids you're looking for :-/") })
+      Missing("These are not the droids you're looking for :-/")
   }
 
   def parseAndRoute(client: TcpClient): Task[HttpResponse] = for (
