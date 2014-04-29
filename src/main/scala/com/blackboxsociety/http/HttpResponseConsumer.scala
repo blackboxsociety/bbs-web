@@ -1,16 +1,20 @@
 package com.blackboxsociety.http
 
+import scalaz.concurrent.Task
+import com.blackboxsociety.net.TcpClient
+
 object HttpResponseConsumer {
 
-  def consume(response: HttpResponse): String = {
-    val statusLine        = genStatusLine(response)
-    val headerLines       = genHeaderLines(response)
-    val sessionLine       = genSessionHeaderLines(response).getOrElse("")
-    val flashLine         = genFlashHeaderLines(response)
-    val contentLengthLine = genContentLengthLine(response)
-    val bodyClause        = genBody(response)
+  def consume(client: TcpClient, response: HttpResponse): Task[Unit] = {
+    val statusLine  = genStatusLine(response)
+    val headerLines = genHeaderLines(response)
+    val sessionLine = genSessionHeaderLines(response).getOrElse("")
+    val flashLine   = genFlashHeaderLines(response)
 
-    s"$statusLine$headerLines$sessionLine$flashLine$contentLengthLine$bodyClause"
+    for (
+      _ <- client.write(s"$statusLine$headerLines$sessionLine$flashLine");
+      n <- response.body.write(client)
+    ) yield n
   }
 
   private def genStatusLine(response: HttpResponse): String = {
@@ -40,14 +44,6 @@ object HttpResponseConsumer {
         else
           ""
     }
-  }
-
-  private def genContentLengthLine(response: HttpResponse): String = {
-    ContentLengthHeader(response.body.length.toString).toString + "\r\n"
-  }
-
-  private def genBody(response: HttpResponse): String = {
-    s"\r\n${response.body}"
   }
 
 }

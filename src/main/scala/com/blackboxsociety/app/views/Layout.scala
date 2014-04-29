@@ -2,6 +2,8 @@ package com.blackboxsociety.app.views
 
 import com.blackboxsociety.mvc._
 import scala.xml.Elem
+import com.blackboxsociety.http.{HttpStringResponseBody, HttpResponseBody}
+import scala.language.implicitConversions
 
 trait Layout extends HtmlView {
 
@@ -30,6 +32,13 @@ trait Layout extends HtmlView {
   def container: Elem
 
   override def toString = s"<!DOCTYPE html>\n${render.toString()}"
+
+}
+
+object Layout {
+  implicit def stringToResponse(layout: Layout): HttpResponseBody = {
+    HttpStringResponseBody(layout)
+  }
 
 }
 
