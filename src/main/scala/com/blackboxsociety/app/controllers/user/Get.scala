@@ -17,7 +17,7 @@ case class Get(implicit services: ServiceManifest) extends Controller {
   val route = HttpRoute(MethodRoute(HttpGet), RegexPathRoute(s"/user/$number/", "uid"))
 
   def action(request: HttpRequest): Task[HttpResponse] = now {
-    Ok(request.getPathVar("uid").getOrElse("uid not found"))
+    Ok(request.getPathVar("uid").getOrElse[String]("uid not found"))
   }
 
 }

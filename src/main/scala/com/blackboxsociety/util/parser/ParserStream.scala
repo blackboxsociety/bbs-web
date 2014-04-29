@@ -5,6 +5,7 @@ import scalaz.syntax.bind._
 import scalaz.concurrent._
 import com.blackboxsociety.util._
 import com.blackboxsociety.util.Finishable
+import scala.language.implicitConversions
 
 trait ParserStream {
   val current: Finishable[String]

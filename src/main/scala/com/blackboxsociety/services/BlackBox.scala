@@ -8,12 +8,6 @@ import com.blackboxsociety.net._
 import com.blackboxsociety.http._
 import com.blackboxsociety.util.parser.TcpParserStream._
 import java.io._
-import com.blackboxsociety.http.HttpRequest
-import com.blackboxsociety.http.HttpParserException
-import com.blackboxsociety.http.InternalServerError
-import com.blackboxsociety.http.MissingRouteException
-import com.blackboxsociety.http.Ok
-import com.blackboxsociety.http.Missing
 import scala.Some
 
 trait BlackBox {
@@ -46,7 +40,7 @@ trait BlackBox {
       val src = "target/resource_managed/main/public/" + request.resource.path.substring(8)
       val file = new File(src)
       if(file.exists() && !src.contains("..")) {
-        Some(Ok(scala.io.Source.fromFile(file).mkString))
+        Some(Ok(new RandomAccessFile(file, "r").getChannel))
       } else {
         None
       }
@@ -57,7 +51,7 @@ trait BlackBox {
 
   def handleConnection(client: TcpClient): Task[Unit] = for (
     response <- parseAndRoute(client).handle(handleError());
-    _        <- client.end(HttpResponseConsumer.consume(response))
+    _        <- HttpResponseConsumer.consume(client, response)
   ) yield ()
 
   def handleError(): PartialFunction[Throwable, HttpResponse] = {

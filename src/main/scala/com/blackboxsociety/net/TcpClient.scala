@@ -16,7 +16,10 @@ trait TcpClient {
   def readAsString(): Task[Finishable[String]]
   def write(b: Array[Byte]): Task[Unit]
   def write(s: String): Task[Unit]
+  def write(c: FileChannel, o: Long = 0): Task[Unit]
+  def end(b: Array[Byte]): Task[Unit]
   def end(s: String): Task[Unit]
+  def end(c: FileChannel): Task[Unit]
   def close(): Task[Unit]
   def close(n: Unit): Task[Unit]
 }
@@ -61,7 +64,24 @@ object TcpClient {
       write(s.getBytes)
     }
 
+    def write(c: FileChannel, o: Long = 0): Task[Unit] = async { next =>
+      EventLoop.addSocketWrite(s, { () =>
+        val size = c.size()
+        val sent = c.transferTo(o, size, s)
+        val rem  = o + sent
+        if (rem < c.size()) {
+          write(c, rem).runAsync(next)
+        } else {
+          next(\/-(Unit))
+        }
+      })
+    }
+
+    def end(b: Array[Byte]): Task[Unit] = write(b) >>= close
+
     def end(s: String): Task[Unit] = write(s) >>= close
+
+    def end(c: FileChannel): Task[Unit] = write(c) >>= close
 
     def close(): Task[Unit] = async { next =>
       EventLoop.closeChannel(s)
