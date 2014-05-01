@@ -34,3 +34,13 @@ object TcpParserStream {
   implicit def TcpClientToParserStream(client: TcpClient): TcpParserStream = TcpParserStream(client)
 
 }
+
+object VoidParserStream extends ParserStream {
+
+  override val current: Finishable[String] = Done("")
+
+  override def latest: Task[ParserStream] = Task.now(this)
+
+  override def withText(s: Finishable[String]): ParserStream = this
+
+}
