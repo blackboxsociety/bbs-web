@@ -1,6 +1,5 @@
 import sbt._
 import sbt.Keys._
-import spray.revolver.RevolverPlugin._
 
 object Build extends Build {
 
