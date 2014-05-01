@@ -1,6 +1,8 @@
 Black Box Society
 =================
 
+[![Build Status](https://travis-ci.org/blackboxsociety/bbs-web.svg?branch=master)](https://travis-ci.org/blackboxsociety/bbs-web)
+
 Black Box Society is a project to index academic and research papers
 in new and interesting ways. It's also really just a sandbox for some
 framework dev i'm doing.
