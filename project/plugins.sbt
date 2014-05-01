@@ -14,3 +14,9 @@ resolvers += "softprops-maven" at "http://dl.bintray.com/content/softprops/maven
 addSbtPlugin("me.lessis" % "less-sbt" % "0.2.2")
 
 addSbtPlugin("org.scala-sbt" % "sbt-closure" % "0.1.4")
+
+resolvers += Classpaths.sbtPluginReleases
+
+addSbtPlugin("com.sksamuel.scoverage" % "sbt-scoverage" % "0.95.1")
+
+addSbtPlugin("com.sksamuel.scoverage" %% "sbt-coveralls" % "0.0.5")

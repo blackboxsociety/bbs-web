@@ -1,3 +1,7 @@
+ScoverageSbtPlugin.instrumentSettings
+
+CoverallsPlugin.coverallsSettings
+
 seq(Revolver.settings: _*)
 
 seq(lessSettings: _*)
