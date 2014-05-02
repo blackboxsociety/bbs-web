@@ -11,7 +11,7 @@ case class HttpRouter(controllers: Controller*) {
   def route(request: HttpRequest): Task[HttpResponse] = {
     controllers.map(h => (h, h.route.route(request))).find(_._2.isDefined) match {
       case Some((c: Controller, Some(h: HttpRequest))) => c.run(h)
-      case _            => fail(MissingRouteException(request))
+      case _ => fail(MissingRouteException(request))
     }
   }
 

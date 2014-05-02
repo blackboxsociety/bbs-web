@@ -1,8 +1,8 @@
 package com.blackboxsociety.mvc
 
 import com.blackboxsociety.http._
-import com.blackboxsociety.http.routes._
 import scalaz.concurrent._
+import com.blackboxsociety.http.routes._
 
 trait Controller {
 

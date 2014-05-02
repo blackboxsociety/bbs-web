@@ -125,7 +125,7 @@ object HttpParser extends RegexParsers {
           case Success(request, next) =>
             finishWithSuccess(stream, request, next, Finishable.done)
           case NoSuccess(error, _)    => "source found$".r findFirstIn error match {
-            case None => fail(HttpParserException("wat"/*error*/))
+            case None => fail(HttpParserException(error))
             case _    => fail(HttpParserException("Received an incomplete HTTP request."))
           }
         }

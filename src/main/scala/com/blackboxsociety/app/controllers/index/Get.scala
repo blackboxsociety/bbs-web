@@ -5,9 +5,8 @@ import com.blackboxsociety.http._
 import scalaz.concurrent._
 import scalaz.concurrent.Task._
 import com.blackboxsociety.app.services._
-import com.blackboxsociety.http.routes._
 import com.blackboxsociety.app.views.Home
-import com.blackboxsociety.http.Ok
+import com.blackboxsociety.http.routes._
 
 case class Get(implicit services: ServiceManifest) extends Controller {
 
