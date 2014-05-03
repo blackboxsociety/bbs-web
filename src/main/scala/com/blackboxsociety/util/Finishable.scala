@@ -2,10 +2,12 @@ package com.blackboxsociety.util
 
 import scalaz._
 
-sealed trait Finishable[A]
+sealed trait Finishable[A] {
+  val value: A
+}
 
-case class More[A](a: A) extends Finishable[A]
-case class Done[A](a: A) extends Finishable[A]
+case class More[A](value: A) extends Finishable[A]
+case class Done[A](value: A) extends Finishable[A]
 
 object Finishable {
 

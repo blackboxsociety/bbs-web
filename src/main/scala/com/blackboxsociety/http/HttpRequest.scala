@@ -4,8 +4,6 @@ import com.blackboxsociety.util.parser.ParserStream
 import scalaz.concurrent.Task
 import com.blackboxsociety.util.{More, Done}
 import com.blackboxsociety.security.crypto.SignedMap
-import com.blackboxsociety.http.routes.{RegexPathRoute, HttpRouteRule}
-import scala.util.matching.Regex
 import com.blackboxsociety.app.services.ServiceManifest
 
 case class HttpRequest(method:   HttpMethod,

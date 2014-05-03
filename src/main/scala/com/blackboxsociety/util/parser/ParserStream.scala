@@ -13,6 +13,14 @@ trait ParserStream {
   def withText(s: Finishable[String]): ParserStream
 }
 
+object ParserStream {
+
+  implicit def TcpClientToParserStream(client: TcpClient): TcpParserStream = TcpParserStream(client)
+
+  implicit def StringToParserStream(str: String): StringParserStream = StringParserStream(str)
+
+}
+
 case class TcpParserStream(client: TcpClient, current: Finishable[String]= More("")) extends ParserStream {
 
   def latest: Task[ParserStream] = {
@@ -29,18 +37,12 @@ case class TcpParserStream(client: TcpClient, current: Finishable[String]= More(
 
 }
 
-object TcpParserStream {
+case class StringParserStream(str: String) extends ParserStream {
 
-  implicit def TcpClientToParserStream(client: TcpClient): TcpParserStream = TcpParserStream(client)
-
-}
-
-object VoidParserStream extends ParserStream {
-
-  override val current: Finishable[String] = Done("")
+  override val current: Finishable[String] = Done(str)
 
   override def latest: Task[ParserStream] = Task.now(this)
 
-  override def withText(s: Finishable[String]): ParserStream = this
+  override def withText(s: Finishable[String]): ParserStream = StringParserStream(s.value)
 
 }
