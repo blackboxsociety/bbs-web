@@ -3,6 +3,11 @@ import sbt.Keys._
 
 import bintray.Plugin._
 import bintray.Keys._
+import spray.revolver.RevolverPlugin._
+import less.Plugin._
+import sbtclosure.SbtClosurePlugin._
+import sbtclosure.SbtClosurePlugin.ClosureKeys._
+import less.Plugin.LessKeys._
 
 object Build extends Build {
 
@@ -12,8 +17,18 @@ object Build extends Build {
     repository in bintray          := "releases"
   )
 
+  val exportableSettings = Revolver.settings ++ lessSettings ++ closureSettings ++ Seq(
+    //crossPaths := false,
+    (resourceManaged in (Compile, less)) <<= (crossTarget in Compile)(_ / "resource_managed" / "main" / "public" / "css"),
+    (resourceManaged in (Compile, closure)) <<= (crossTarget in Compile)(_ / "resource_managed" / "main" / "public" / "javascript"),
+    (filter in (Compile, less)) := "main.less"
+  )
+
   val root = Project("root", file("."))
     .settings(customBintraySettings: _*)
+    .settings(ScoverageSbtPlugin.instrumentSettings: _*)
+    .settings(CoverallsPlugin.coverallsSettings: _*)
+    .settings(exportableSettings: _*)
     .settings(
       name                  := "blackbox",
       organization          := "com.blackboxsociety",

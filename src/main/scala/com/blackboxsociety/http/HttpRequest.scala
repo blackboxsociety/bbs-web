@@ -13,11 +13,11 @@ case class HttpRequest(method:   HttpMethod,
                        pathVars: Map[String, String] = Map())
 {
 
-  def session()(implicit secret: SessionSecret): SignedSession = {
+  def session(secret: SessionSecret): SignedSession = {
     SignedSession(secret, readSignedCookie(secret.value, "session"))
   }
 
-  def flash()(implicit secret: FlashSecret): FlashSession = {
+  def flash(secret: FlashSecret): FlashSession = {
     FlashSession(secret, readSignedCookie(secret.value, "flash"))
   }
 
