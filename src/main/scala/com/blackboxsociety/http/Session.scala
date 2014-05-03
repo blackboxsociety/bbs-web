@@ -3,9 +3,9 @@ package com.blackboxsociety.http
 import play.api.libs.json.Json
 import com.blackboxsociety.security.crypto.SignedMap
 
-sealed trait Session[Self <: Session[Self]] {
+sealed trait Session[Self <: Session[Self, Secret], Secret <: SignedSecret] {
 
-  val secret: String
+  val secret: Secret
 
   val data: Map[String, String]
 
@@ -32,12 +32,18 @@ sealed trait Session[Self <: Session[Self]] {
   }
 
   def signature(): String = {
-    SignedMap.sign(secret, data)
+    SignedMap.sign(secret.value, data)
   }
 
 }
 
-case class SignedSession(secret: String, data: Map[String, String]) extends Session[SignedSession] {
+sealed trait SignedSecret {
+  val value: String
+}
+case class SessionSecret(value: String) extends SignedSecret
+case class FlashSecret(value: String) extends SignedSecret
+
+case class SignedSession(secret: SessionSecret, data: Map[String, String]) extends Session[SignedSession, SessionSecret] {
 
   override def withFreshData(newData: Map[String, String]): SignedSession = {
     SignedSession(secret, newData)
@@ -45,7 +51,7 @@ case class SignedSession(secret: String, data: Map[String, String]) extends Sess
 
 }
 
-case class FlashSession(secret: String, data: Map[String, String]) extends Session[FlashSession] {
+case class FlashSession(secret: FlashSecret, data: Map[String, String]) extends Session[FlashSession, FlashSecret] {
 
   override def withFreshData(newData: Map[String, String]): FlashSession = {
     FlashSession(secret, newData)
