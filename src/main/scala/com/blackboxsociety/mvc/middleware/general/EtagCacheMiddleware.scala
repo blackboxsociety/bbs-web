@@ -2,7 +2,7 @@ package com.blackboxsociety.mvc.middleware.general
 
 import com.blackboxsociety.http._
 import scalaz.concurrent.Task
-import com.blackboxsociety.security.crypto.Hash
+import com.blackboxsociety.waterhouse.Hash
 
 object EtagCacheMiddleware {
 
@@ -29,8 +29,8 @@ object EtagCacheMiddleware {
   }
 
   private def hashFromBody(body: HttpResponseBody): Option[String]= body match {
-    case HttpStringResponseBody(s)      => Some(Hash.sha1(s.getBytes))
-    case HttpByteResponseBody(b)        => Some(Hash.sha1(b))
+    case HttpStringResponseBody(s)      => Some(Hash.stringDigest[Hash.Sha1.type](s))
+    case HttpByteResponseBody(b)        => Some(Hash.bytesDigest[Hash.Sha1.type](b).map("%02X" format _).mkString)
     case HttpFileChannelResponseBody(c) => None
   }
 
