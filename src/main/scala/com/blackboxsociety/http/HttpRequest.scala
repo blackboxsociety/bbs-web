@@ -4,7 +4,6 @@ import com.blackboxsociety.util.parser.ParserStream
 import scalaz.concurrent.Task
 import com.blackboxsociety.util.{More, Done}
 import com.blackboxsociety.security.crypto.SignedMap
-import com.blackboxsociety.app.services.ServiceManifest
 
 case class HttpRequest(method:   HttpMethod,
                        resource: HttpResource,
@@ -14,12 +13,12 @@ case class HttpRequest(method:   HttpMethod,
                        pathVars: Map[String, String] = Map())
 {
 
-  def session()(implicit services: ServiceManifest): SignedSession = {
-    SignedSession(services.sessionSecret, readSignedCookie(services.sessionSecret, "session"))
+  def session()(implicit secret: SessionSecret): SignedSession = {
+    SignedSession(secret, readSignedCookie(secret.value, "session"))
   }
 
-  def flash()(implicit services: ServiceManifest): FlashSession = {
-    FlashSession(services.sessionSecret, readSignedCookie(services.sessionSecret, "flash"))
+  def flash()(implicit secret: FlashSecret): FlashSession = {
+    FlashSession(secret, readSignedCookie(secret.value, "flash"))
   }
 
   private def readSignedCookie(key: String, secret: String): Map[String, String] = {
