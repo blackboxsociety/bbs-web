@@ -6,7 +6,7 @@ object Cookie {
     data.map { case (k, v) => s"$k=$v"  } mkString "; "
 
   def parse(str: String): Map[String, String] = {
-    val pairs = str.split("; ").toList
+    val pairs = str.split("; ")
     val keys  = pairs.map(_.split("="))
     keys.foldLeft[Map[String, String]](Map()) { (m, n) =>
       if (n.length > 1) {

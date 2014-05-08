@@ -26,14 +26,12 @@ object Build extends Build {
 
   val root = Project("root", file("."))
     .settings(customBintraySettings: _*)
-    .settings(ScoverageSbtPlugin.instrumentSettings: _*)
-    .settings(CoverallsPlugin.coverallsSettings: _*)
     .settings(exportableSettings: _*)
     .settings(
       name                  := "blackbox",
       organization          := "com.blackboxsociety",
       version               := "0.1.0",
-      scalaVersion          := "2.10.3",
+      scalaVersion          := "2.11.0",
       licenses              += ("MIT", url("http://opensource.org/licenses/MIT")),
       //scalacOptions       += "-feature",
       //scalacOptions       += "-deprecation",
@@ -47,7 +45,7 @@ object Build extends Build {
       libraryDependencies   += "org.scalaz"          %% "scalaz-iteratee" % "7.0.6",
       libraryDependencies   += "com.typesafe.play"   % "play-json_2.10" % "2.2.0-RC1",
       libraryDependencies   += "org.specs2"          %% "specs2" % "2.3.11" % "test",
-      libraryDependencies   += "com.blackboxsociety" %% "waterhouse" % "0.1.0"
+      libraryDependencies   += "com.blackboxsociety" %% "waterhouse" % "0.2.0"
     )
 
 }

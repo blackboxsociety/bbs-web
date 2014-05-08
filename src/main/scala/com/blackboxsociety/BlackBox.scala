@@ -1,4 +1,4 @@
-package com.blackboxsociety.services
+package com.blackboxsociety
 
 import com.blackboxsociety.util._
 import scalaz.ImmutableArray
@@ -6,6 +6,7 @@ import scalaz.concurrent._
 import scalaz.syntax.bind._
 import com.blackboxsociety.net._
 import com.blackboxsociety.http._
+import com.blackboxsociety.services._
 
 trait BlackBox {
 
@@ -50,7 +51,7 @@ trait BlackBox {
   ) yield response
 
   def run(args: ImmutableArray[String]) = {
-    genServer.runAsync({ _ => Unit})
+    genServer().runAsync({ _ => Unit})
     EventLoop.run()
   }
 
