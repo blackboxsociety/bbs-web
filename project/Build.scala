@@ -30,7 +30,7 @@ object Build extends Build {
     .settings(
       name                  := "blackbox",
       organization          := "com.blackboxsociety",
-      version               := "0.1.0",
+      version               := "0.1.1",
       scalaVersion          := "2.11.0",
       licenses              += ("MIT", url("http://opensource.org/licenses/MIT")),
       //scalacOptions       += "-feature",
