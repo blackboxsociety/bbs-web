@@ -2,4 +2,4 @@ language: scala
 scala:
    - 2.10.3
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION clean scoverage:test
+  - sbt ++$TRAVIS_SCALA_VERSION test
