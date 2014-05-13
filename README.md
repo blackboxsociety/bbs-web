@@ -1,7 +1,7 @@
 Black Box Framework
 ===================
 
-[![Build Status](https://travis-ci.org/blackboxsociety/BlackBox.svg?branch=master)](https://travis-ci.org/blackboxsociety/bbs-web)
+[![Build Status](https://travis-ci.org/blackboxsociety/BlackBox.svg?branch=master)](https://travis-ci.org/blackboxsociety/BlackBox)
 
 The Black Box Framework is a lightweight, fully asynchronous, single threaded
 MVC web framework that leverages scalaz's purely functional asynchronous
